@@ -1,4 +1,4 @@
-package ru.dmitry.NauJava;
+package ru.dmitry.naujava;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

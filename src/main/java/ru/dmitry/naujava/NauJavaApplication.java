@@ -1,4 +1,4 @@
-package ru.dmitry.NauJava;
+package ru.dmitry.naujava;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
