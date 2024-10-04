@@ -3,13 +3,15 @@ package naumen.course;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 
 /**
  * Скачивает файл из интернета в файл на локальном хранилище.
  * Скачивание происходит в отдельном потоке порциями.
- * После чтения и записи очередной порции, поток смотрит, не остановили ли скачивание (не прервали ли его).
- * Если скачивание остановили, поток удаляет уже файл cо скачанными данными и завершается.
+ * После чтения и записи очередной порции, поток смотрит, не остановили ли скачивание (прервали ли его).
+ * Если скачивание остановили, поток удаляет загружаемый файл со скачанными данными и завершается.
  */
 public class TaskImpl implements Task {
     /**
@@ -30,7 +32,7 @@ public class TaskImpl implements Task {
     /**
      * Состояние объекта, загружающего файл
      */
-    private volatile TaskState state = TaskState.CREATED;
+    private TaskState state = TaskState.CREATED;
 
     /**
      * Поток, осуществляющий скачивание файла
@@ -78,29 +80,39 @@ public class TaskImpl implements Task {
     }
 
     @Override
-    public void start() {
-        if (!TaskState.CREATED.equals(state)) {
+    public synchronized void start() {
+        if(!TaskState.CREATED.equals(state)) {
             return;
         }
 
         downloadThread = new Thread(() -> {
-            try (BufferedInputStream in = new BufferedInputStream(sourceUrl.openStream(), BUFFER_SIZE);
-                 FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
+            boolean isStopped = false;
+            try(BufferedInputStream in = new BufferedInputStream(sourceUrl.openStream(), BUFFER_SIZE);
+                FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
                 byte[] buffer = new byte[BUFFER_SIZE];
                 int bytesRead;
-                while ((bytesRead = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
+                while((bytesRead = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
                     fileOutputStream.write(buffer, 0, bytesRead);
-                    if (Thread.currentThread().isInterrupted()) {
-                        if (!destinationFile.delete()) {
-                            throw new Exception("Destination file could not be deleted after stop.");
-                        }
-                        state = TaskState.STOPPED;
-                        return;
+                    if(Thread.currentThread().isInterrupted()) {
+                        isStopped = true;
+                        break;
                     }
                 }
-            } catch (Exception e) {
+            } catch(Exception e) {
                 exception = e;
                 state = TaskState.ERROR;
+                return;
+            }
+
+            if(isStopped) {
+                try {
+                    Files.delete(destinationFile.toPath());
+                    state = TaskState.STOPPED;
+                } catch(IOException e) {
+                    exception = e;
+                    state = TaskState.ERROR;
+                }
+                return;
             }
             state = TaskState.FINISHED;
         });
@@ -111,7 +123,7 @@ public class TaskImpl implements Task {
 
     @Override
     public void stop() {
-        if (state == TaskState.RUNNING) {
+        if(state == TaskState.RUNNING) {
             downloadThread.interrupt();
         }
     }

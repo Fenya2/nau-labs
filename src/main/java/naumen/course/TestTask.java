@@ -17,7 +17,7 @@ public class TestTask {
             System.out.println("Tap any button to stop: ");
             try {
                 System.in.read();
-            } catch (IOException e) {
+            } catch(IOException e) {
                 throw new RuntimeException(e);
             }
             task.stop();
