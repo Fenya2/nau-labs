@@ -95,7 +95,7 @@ public class Task3V4 {
     /**
      * Решает задачу
      */
-    public List<String> solve() {
+    private static List<String> solve() {
         List<Employee> employees = List.of(
                 new Employee("Иванов Александр Иванович", 10, "dev", 100.0),
                 new Employee("Петрова Анна Александровна", 15, "qa", 200.0),
@@ -109,13 +109,13 @@ public class Task3V4 {
     /**
      * Возвращает список строк в формате "Имя - Отдел" на основе переданного списка сотрудников
      */
-    private List<String> mapEmployeesToNameDepartmentPairs(List<Employee> employees) {
+    private static List<String> mapEmployeesToNameDepartmentPairs(List<Employee> employees) {
         return employees.stream()
                 .map(employee -> formatter.format(new Object[]{employee.getName(), employee.getDepartment()}))
                 .toList();
     }
 
     public static void main(String[] args) {
-        new Task3V4().solve().forEach(System.out::println);
+        Task3V4.solve().forEach(System.out::println);
     }
 }
