@@ -32,19 +32,13 @@ public class Task4V3 {
     /**
      * Разобранный ответ на запрос по целевому URI
      */
-    static class DTO {
-        Map<String, String> headers;
-
-        @JsonProperty("headers")
-        public Map<String, String> getHeaders() {
-            return headers;
-        }
+    private record DTO(@JsonProperty("headers") Map<String, String> headers) {
     }
 
     /**
      * Решает задачу
      */
-    public void solve() {
+    private void solve() {
         DTO dto = headersDTO();
         printHeaderValues(dto);
     }
@@ -53,7 +47,7 @@ public class Task4V3 {
      * Печатает в stdout значения заголовков у переданного DTO объекта
      */
     private void printHeaderValues(DTO dto) {
-        dto.getHeaders().values().stream().reduce((a, b) -> a + ", " + b).ifPresent(System.out::println);
+        dto.headers.values().stream().reduce((a, b) -> a + ", " + b).ifPresent(System.out::println);
     }
 
     /**
@@ -62,24 +56,25 @@ public class Task4V3 {
     private DTO headersDTO() {
         try {
             return mapper.readValue(makeGetRequest(), DTO.class);
-        } catch (IOException e) {
+        } catch(IOException e) {
             throw new RuntimeException("Не удалось создать DTO", e);
         }
     }
 
     /**
      * Выполнить GET-запрос на целевой URI
+     *
      * @return тело ответа
      */
     private byte[] makeGetRequest() {
-        try (HttpClient client = HttpClient.newHttpClient()) {
+        try(HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
                     .build();
             HttpResponse<byte[]> response = client.send(request,
                     HttpResponse.BodyHandlers.ofByteArray());
             return response.body();
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new RuntimeException("Не удалось выполнить запрос", e);
         }
     }
