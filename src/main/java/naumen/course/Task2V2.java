@@ -18,8 +18,8 @@ public class Task2V2 {
     /**
      * Решает задачу
      */
-    public void solve(int n) {
-        ArrayList<Double> list = new ArrayList<>(Collections.nCopies(n, 0.0));
+    private void solve(int arraySize) {
+        ArrayList<Double> list = new ArrayList<>(Collections.nCopies(arraySize, 0.0));
         fillArrayListWithRandomNumbers(list);
         System.out.println(list);
         quickSort(list, 0, list.size() - 1);
