@@ -17,8 +17,8 @@ public class Task1V5 {
     /**
      * Решает задачу
      */
-    public int solve(int n) {
-        int[] array = new int[n];
+    private int solve(int arraySize) {
+        int[] array = new int[arraySize];
         fillArrayWithRandomNumbers(array);
         System.out.println(Arrays.toString(array));
         return getSumOfPositiveElements(array);
@@ -35,7 +35,7 @@ public class Task1V5 {
      * Заполняет массив случайными числами в диапазоне от -100 до 100
      */
     private void fillArrayWithRandomNumbers(int[] array) {
-        for (int i = 0; i < array.length; i++) {
+        for(int i = 0; i < array.length; i++) {
             array[i] = random.nextInt(-100, 101);
         }
     }
