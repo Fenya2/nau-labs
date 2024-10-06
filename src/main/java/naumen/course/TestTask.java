@@ -7,7 +7,8 @@ import java.net.URI;
 import java.util.Scanner;
 
 /**
- * Скачивание файла размером 100MB. При нажатии любой кнопки скачивание останавливается
+ * Скачивание файла размером 100MB. При нажатии любой кнопки, если файл не докачался, он удаляется. Если докачался,
+ * то не удаляется
  */
 public class TestTask {
     public static void main(String[] args) throws MalformedURLException {

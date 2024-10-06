@@ -86,7 +86,6 @@ public class TaskImpl implements Task {
         }
 
         downloadThread = new Thread(() -> {
-            boolean isStopped = false;
             try(BufferedInputStream in = new BufferedInputStream(sourceUrl.openStream(), BUFFER_SIZE);
                 FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
                 byte[] buffer = new byte[BUFFER_SIZE];
@@ -94,27 +93,30 @@ public class TaskImpl implements Task {
                 while((bytesRead = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
                     fileOutputStream.write(buffer, 0, bytesRead);
                     if(Thread.currentThread().isInterrupted()) {
-                        isStopped = true;
+                        state = TaskState.STOPPED;
                         break;
                     }
                 }
             } catch(Exception e) {
                 exception = e;
                 state = TaskState.ERROR;
-                return;
-            }
-
-            if(isStopped) {
-                try {
-                    Files.delete(destinationFile.toPath());
-                    state = TaskState.STOPPED;
-                } catch(IOException e) {
-                    exception = e;
-                    state = TaskState.ERROR;
+            } finally {
+                switch(state) {
+                    case STOPPED:
+                        try {
+                            Files.delete(destinationFile.toPath());
+                        } catch(IOException e) {
+                            exception = e;
+                            state = TaskState.ERROR;
+                        }
+                        break;
+                    case RUNNING:
+                        state = TaskState.FINISHED;
+                        break;
+                    default:
+                        break;
                 }
-                return;
             }
-            state = TaskState.FINISHED;
         });
 
         state = TaskState.RUNNING;
