@@ -1,43 +1,69 @@
 package ru.dmitry.naujava.entity;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import ru.dmitry.naujava.Constants;
 
 /**
- * Категория дохода/расхода*
+ * Категория доходов/расходов
  */
+@Entity
+@Table(name = "tbl_category")
 public class Category {
     /**
      * Идентификатор
      */
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     /**
      * Имя
      */
+    @Column(nullable = false)
     private String name;
 
     /**
      * Описание
      */
+    @Column(length = Constants.DESCRIPTION_SIZE)
     private String description;
 
     /**
      * Категория, в которую текущая вложена. {@code null}, если никуда не вложена
      */
+    @ManyToOne
+    @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
     /**
-     * Множество подкатегорий данной категории
+     * Создатель категории
      */
-    private Set<Category> nested = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Category() {
+    }
+
+    public Category(String name, String description, Category parentCategory, User user) {
+        this.name = name;
+        this.description = description;
+        this.parentCategory = parentCategory;
+        this.user = user;
+    }
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -65,12 +91,12 @@ public class Category {
         this.parentCategory = parentCategory;
     }
 
-    public Set<Category> getNested() {
-        return nested;
+    public User getUser() {
+        return user;
     }
 
-    public void setNested(Set<Category> nested) {
-        this.nested = Objects.requireNonNullElseGet(nested, HashSet::new);
+    public void setUser(User creator) {
+        this.user = creator;
     }
 
     @Override
@@ -82,7 +108,7 @@ public class Category {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return id;
     }
 
     /**
@@ -94,7 +120,7 @@ public class Category {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", parentCategory=" + parentCategory +
-                ", children=" + nested +
+                ", creator=" + user +
                 '}';
     }
 }

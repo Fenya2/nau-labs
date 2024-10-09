@@ -2,6 +2,7 @@ package ru.dmitry.naujava.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import ru.dmitry.naujava.entity.Category;
 import ru.dmitry.naujava.repository.CategoryRepository;
 
@@ -22,9 +23,15 @@ public class CategoryServiceImpl implements CategoryService {
      */
     private final CategoryRepository categoryRepository;
 
+    /**
+     * Менеджер транзакций
+     */
+    private final PlatformTransactionManager transactionManager;
+
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, PlatformTransactionManager transactionManager) {
         this.categoryRepository = categoryRepository;
+        this.transactionManager = transactionManager;
     }
 
     @Override
@@ -32,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
         if(parent == null) {
             removeChildFromParentNested(child);
             child.setParentCategory(null);
-            categoryRepository.update(child);
+            categoryRepository.save(child);
             return;
         }
 
@@ -47,21 +54,20 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         removeChildFromParentNested(child);
-        parent.getNested().add(child);
         child.setParentCategory(parent);
 
-        categoryRepository.update(parent);
-        categoryRepository.update(child);
+        categoryRepository.save(parent);
+        categoryRepository.save(child);
     }
 
     @Override
     public Set<Category> getNestedCategories(Category category) {
         Set<Category> nestedCategories = new HashSet<>();
-        Queue<Category> categoryQueue = new ArrayDeque<>(category.getNested());
+        Queue<Category> categoryQueue = new ArrayDeque<>(categoryRepository.getNestedOf(category));
         while(!categoryQueue.isEmpty()) {
             Category c = categoryQueue.poll();
             nestedCategories.add(c);
-            categoryQueue.addAll(c.getNested());
+            categoryQueue.addAll(categoryRepository.getNestedOf(c));
         }
         return nestedCategories;
     }
@@ -78,22 +84,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean isNestedCategory(Category parentCategory, Category childCategory) {
-        return getParentCategories(childCategory).contains(parentCategory);
-    }
-
-    @Override
     public void createCategory(Category category) {
         category.setParentCategory(null);
-        category.setNested(null);
-        categoryRepository.create(category);
+//        category.setNested(null);
+        categoryRepository.save(category);
     }
 
     @Override
     public void deleteCategory(Category category) {
-        getNestedCategories(category).forEach(c -> categoryRepository.delete(c.getId()));
+//        getNestedCategories(category).forEach(c -> categoryRepository.deleteById(c.getId()));
         removeChildFromParentNested(category);
-        categoryRepository.delete(category.getId());
+        categoryRepository.deleteById(category.getId());
     }
 
     /**
@@ -103,8 +104,8 @@ public class CategoryServiceImpl implements CategoryService {
     private void removeChildFromParentNested(Category category) {
         Category parent = category.getParentCategory();
         if(parent != null) {
-            parent.getNested().remove(category);
-            categoryRepository.update(parent);
+//            parent.getNested().remove(category);
+            categoryRepository.save(parent);
         }
     }
 }
