@@ -1,9 +1,9 @@
 package ru.dmitry.naujava.service;
 
 import ru.dmitry.naujava.entity.Category;
+import ru.dmitry.naujava.entity.User;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Сервис для работы с {@link Category категориями}
@@ -23,9 +23,12 @@ public interface CategoryService {
     public void nestCategory(Category parent, Category child) throws CategoryException;
 
     /**
-     * Возвращает множество категорий, вложенных в данную
+     * Возвращает список категорий, вложенных в данную.
+     * Список упорядочен по уровням вложенности категорий в данную.
+     * Т.Е в начале списка категории непосредственно вложенные в переданную категорию,
+     * в конце - категории, вложенные в данную и не имеющие вложенных категорий (листья)
      */
-    public Set<Category> getNestedCategories(Category category);
+    public List<Category> getNestedCategories(Category category);
 
     /**
      * Возвращает список категорий, являющихся родительскими для данной. <br>
@@ -36,9 +39,15 @@ public interface CategoryService {
     public List<Category> getParentCategories(Category category);
 
     /**
-     * Сохраняет категорию в базу данных, как корневую (затирает родительскую категорию)
+     * Создает категорию, проверяя целостность данных перед добавлением в систему
+     * @param name имя категории
+     * @param description описание категории
+     * @param parent категория, куда создаваемая вложена
+     * @param user создатель категории
+     * @return созданная категория
+     * @throws CategoryException если создать категорию с переданными данными не получилось
      */
-    public void createCategory(Category category);
+    public Category createCategory(String name, String description, Category parent, User user) throws CategoryException;
 
     /**
      * Удаляет категорию и все ее вложенные категории
