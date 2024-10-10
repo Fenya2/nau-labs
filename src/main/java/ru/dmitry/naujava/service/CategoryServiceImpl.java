@@ -86,7 +86,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void createCategory(Category category) {
         category.setParentCategory(null);
-//        category.setNested(null);
         categoryRepository.save(category);
     }
 

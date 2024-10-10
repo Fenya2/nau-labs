@@ -36,10 +36,9 @@ public interface CategoryService {
     public List<Category> getParentCategories(Category category);
 
     /**
-     * Сохраняет категорию в базу данных, сохраняя целостность данных в приложении
-     * @throws CategoryException если переданную категорию сохранить невозможно
+     * Сохраняет категорию в базу данных, как корневую (затирает родительскую категорию)
      */
-    public void createCategory(Category category) throws CategoryException;
+    public void createCategory(Category category);
 
     /**
      * Удаляет категорию и все ее вложенные категории
