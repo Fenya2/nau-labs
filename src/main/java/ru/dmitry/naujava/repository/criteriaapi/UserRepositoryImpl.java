@@ -1,4 +1,4 @@
-package ru.dmitry.naujava.repository;
+package ru.dmitry.naujava.repository.criteriaapi;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;

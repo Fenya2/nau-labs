@@ -8,6 +8,7 @@ import ru.dmitry.naujava.entity.Expense;
 import ru.dmitry.naujava.entity.Income;
 import ru.dmitry.naujava.entity.Transaction;
 import ru.dmitry.naujava.entity.User;
+import ru.dmitry.naujava.repository.criteriaapi.UserRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

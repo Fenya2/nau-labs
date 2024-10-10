@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.dmitry.naujava.entity.Category;
 import ru.dmitry.naujava.entity.User;
+import ru.dmitry.naujava.repository.criteriaapi.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;

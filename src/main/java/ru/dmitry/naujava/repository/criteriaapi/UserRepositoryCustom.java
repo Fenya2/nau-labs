@@ -1,4 +1,4 @@
-package ru.dmitry.naujava.repository;
+package ru.dmitry.naujava.repository.criteriaapi;
 
 import ru.dmitry.naujava.entity.User;
 
