@@ -2,6 +2,7 @@ package ru.dmitry.naujava.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import ru.dmitry.naujava.entity.Category;
 import ru.dmitry.naujava.entity.User;
 
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  * DAO для {@link Category}
  */
+@RepositoryRestResource(path = "categories")
 public interface CategoryRepository extends CrudRepository<Category, Long> {
     /**
      * Возвращает список корневых категорий (категорий без родительской категории)

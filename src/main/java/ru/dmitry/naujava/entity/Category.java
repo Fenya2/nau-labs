@@ -21,7 +21,7 @@ public class Category {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     /**
      * Имя
@@ -39,7 +39,7 @@ public class Category {
      * Категория, в которую текущая вложена. {@code null}, если никуда не вложена
      */
     @ManyToOne
-    @JoinColumn(name = "parent_category_id")
+    @JoinColumn(name = "parent_category")
     private Category parentCategory;
 
     /**
@@ -108,7 +108,7 @@ public class Category {
 
     @Override
     public int hashCode() {
-        return id;
+        return (int) id;
     }
 
     /**

@@ -4,13 +4,16 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import ru.dmitry.naujava.dto.CategoryDTO;
 import ru.dmitry.naujava.entity.Category;
 import ru.dmitry.naujava.entity.User;
 import ru.dmitry.naujava.repository.CategoryRepository;
+import ru.dmitry.naujava.repository.criteriaapi.UserRepository;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 
 /**
@@ -20,14 +23,16 @@ import java.util.Queue;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-
     private final PlatformTransactionManager transactionManager;
+    private final UserRepository userRepository;
 
     @Autowired
     public CategoryServiceImpl(CategoryRepository categoryRepository,
-                               PlatformTransactionManager transactionManager) {
+                               PlatformTransactionManager transactionManager,
+                               UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
         this.transactionManager = transactionManager;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -77,6 +82,18 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category(name, description, parent, user);
         categoryRepository.save(category);
         return category;
+    }
+
+    @Override
+    public Category createCategory(CategoryDTO categoryDTO) {
+        Optional<User> optionalUser = userRepository.findById(categoryDTO.userId());
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryDTO.parentId());
+        if(optionalUser.isEmpty()) {
+            throw new CategoryException(
+                    "Can't find user with id %s to create category for him".formatted(categoryDTO.userId()));
+        }
+        User user = optionalUser.get();
+        return createCategory(categoryDTO.name(), categoryDTO.description(), optionalCategory.orElse(null), user);
     }
 
     @Transactional

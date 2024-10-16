@@ -1,5 +1,6 @@
 package ru.dmitry.naujava.service;
 
+import ru.dmitry.naujava.dto.CategoryDTO;
 import ru.dmitry.naujava.entity.Category;
 import ru.dmitry.naujava.entity.User;
 
@@ -48,6 +49,11 @@ public interface CategoryService {
      * @throws CategoryException если создать категорию с переданными данными не получилось
      */
     public Category createCategory(String name, String description, Category parent, User user) throws CategoryException;
+
+    /**
+     * Создает категорию из переданного {@link CategoryDTO}
+     */
+    public Category createCategory(CategoryDTO categoryDTO);
 
     /**
      * Удаляет категорию и все ее вложенные категории
