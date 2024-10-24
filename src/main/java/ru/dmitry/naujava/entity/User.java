@@ -2,16 +2,12 @@ package ru.dmitry.naujava.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import ru.dmitry.naujava.security.Role;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 /**
  * Пользователь приложения
@@ -29,39 +25,26 @@ public class User {
     /**
      * Имя пользователя
      */
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
-
-    /**
-     * Пароль пользователя (хранится в зашифрованном виде)
-     */
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    /**
-     * Роль пользователя в системе
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Set<Role> roles;
-
-    /**
-     * Имя пользователя
-     */
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
+
+    /**
+     * Электронная почта пользователя
+     */
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
     /**
      * Дата рождения
      */
-    @Column(name = "birthday_date")
+    @Column(name = "birthday_date", nullable = false)
     private LocalDate birthdayDate;
 
     public User() {}
 
-    public User(String username, String password, LocalDate birthdayDate) {
-        this.username = username;
-        this.password = password;
+    public User(String name, String email, LocalDate birthdayDate) {
+        this.name = name;
+        this.email = email;
         this.birthdayDate = birthdayDate;
     }
 
@@ -93,35 +76,19 @@ public class User {
         this.name = name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public LocalDate getBirthdayDate() {
         return birthdayDate;
     }
 
     public void setBirthdayDate(LocalDate birthdayDate) {
         this.birthdayDate = birthdayDate;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String login) {
-        this.username = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> role) {
-        this.roles = role;
     }
 }
