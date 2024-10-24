@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserRepositoryImplTest {
 
     private final UserRepository userRepository;
-    private static List<User> usersWithDifferntBirthdays;
+    private static List<User> users;
 
     @Autowired
     public UserRepositoryImplTest(UserRepository userRepository) {
@@ -24,7 +24,7 @@ class UserRepositoryImplTest {
 
     @BeforeEach
     public void setUp() {
-        usersWithDifferntBirthdays = List.of(
+        users = List.of(
                 new User("1", "1", LocalDate.of(2024, 1, 1)),
                 new User("2", "2", LocalDate.of(2004, 1, 1)),
                 new User("3", "3", LocalDate.of(1984, 1, 1)));
@@ -32,15 +32,27 @@ class UserRepositoryImplTest {
 
     @Test
     void testFindByBirthdayDateEarlierThan() {
-        userRepository.saveAll(usersWithDifferntBirthdays);
+        userRepository.saveAll(users);
         List<User> users = userRepository.findByBirthdayDateEarlierThan(LocalDate.of(2014, 1, 1));
-        assertThat(users).containsExactlyElementsOf(usersWithDifferntBirthdays.subList(1, 3));
+        assertThat(users).containsExactlyElementsOf(UserRepositoryImplTest.users.subList(1, 3));
     }
 
     @Test
     void testFindByBirthdayDateAfter() {
-        userRepository.saveAll(usersWithDifferntBirthdays);
+        userRepository.saveAll(users);
         List<User> users = userRepository.findByBirthdayDateAfter(LocalDate.of(1994, 1, 1));
-        assertThat(users).containsExactlyElementsOf(usersWithDifferntBirthdays.subList(0, 2));
+        assertThat(users).containsExactlyElementsOf(UserRepositoryImplTest.users.subList(0, 2));
+    }
+
+    @Test
+    void testFindByUsernameSuccess() {
+        userRepository.save(users.getFirst());
+        User user = userRepository.findByUsername("1").orElseThrow();
+        assertThat(user).isNotNull();
+    }
+
+    @Test
+    void testFindByUsernameFailure() {
+        assertThat(userRepository.findByUsername("1")).isEmpty();
     }
 }
